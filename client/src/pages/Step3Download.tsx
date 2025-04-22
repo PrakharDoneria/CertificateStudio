@@ -1,7 +1,7 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Download } from "lucide-react";
+import { CheckCircle, Download, Share2, FileText } from "lucide-react";
 import Certificate from "@/components/Certificate";
 import { useToast } from "@/hooks/use-toast";
 import { jsPDF } from "jspdf";
@@ -22,6 +22,29 @@ const Step3Download: React.FC<Step3DownloadProps> = ({
 }) => {
   const { toast } = useToast();
   const certificateRef = useRef<HTMLDivElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  
+  // Generate preview image when component mounts
+  useEffect(() => {
+    generatePreview();
+  }, []);
+  
+  const generatePreview = async () => {
+    if (!certificateRef.current) return;
+    
+    try {
+      const canvas = await html2canvas(certificateRef.current, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+      });
+      
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      setPreviewUrl(dataUrl);
+    } catch (error) {
+      console.error("Error generating preview:", error);
+    }
+  };
   
   const handleDownload = async () => {
     if (!certificateRef.current) return;
@@ -55,6 +78,7 @@ const Step3Download: React.FC<Step3DownloadProps> = ({
         description: "Certificate downloaded successfully.",
       });
     } catch (error) {
+      console.error("Download error:", error);
       toast({
         title: "Error",
         description: "Failed to generate PDF. Please try again.",
@@ -63,31 +87,68 @@ const Step3Download: React.FC<Step3DownloadProps> = ({
     }
   };
   
+  const handleImageDownload = () => {
+    if (!previewUrl) return;
+    
+    const link = document.createElement('a');
+    link.href = previewUrl;
+    link.download = `certificate_${certificateData.certificateId}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Success!",
+      description: "Certificate image downloaded successfully.",
+    });
+  };
+  
   return (
-    <Card className="bg-white shadow rounded-lg mb-8">
-      <CardContent className="pt-6">
+    <Card className="bg-white shadow-lg rounded-xl mb-8 overflow-hidden border-0">
+      <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 text-white">
+        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm mb-4">
+          <CheckCircle className="h-6 w-6 text-white" />
+        </div>
+        <h2 className="text-2xl font-bold text-center">
+          Certificate Generated Successfully!
+        </h2>
+        <p className="text-center text-white/80 mt-2">
+          Your certificate has been generated and saved locally.
+        </p>
+      </div>
+      
+      <CardContent className="p-6">
         <div className="text-center">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
-            <CheckCircle className="h-6 w-6 text-green-600" />
-          </div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">
-            Certificate Generated Successfully!
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Your certificate has been generated and saved. You can download it now.
-          </p>
+          {previewUrl ? (
+            <div className="mb-6 rounded-lg overflow-hidden shadow-lg border border-gray-100">
+              <img 
+                src={previewUrl} 
+                alt="Certificate Preview" 
+                className="w-full h-auto"
+              />
+            </div>
+          ) : (
+            <div className="flex justify-center items-center h-64 bg-gray-50 rounded-lg mb-6">
+              <p className="text-gray-400">Generating preview...</p>
+            </div>
+          )}
 
-          <div className="max-w-md mx-auto bg-gray-50 rounded-lg p-4 border border-gray-200 mb-6">
-            <p className="text-sm text-gray-600 mb-1">Certificate details:</p>
-            <p className="text-sm text-gray-900">
-              <span className="font-medium">Name:</span> {certificateData.name}
-            </p>
-            <p className="text-sm text-gray-900">
-              <span className="font-medium">Certificate ID:</span> {certificateData.certificateId}
-            </p>
-            <p className="text-sm text-gray-900">
-              <span className="font-medium">Generated on:</span> {certificateData.date}
-            </p>
+          <div className="max-w-md mx-auto bg-blue-50 rounded-xl p-4 border border-blue-100 mb-6">
+            <p className="text-sm text-blue-800 font-medium mb-2">Certificate Details</p>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-700 flex justify-between">
+                <span className="font-medium">Name:</span> 
+                <span>{certificateData.name}</span>
+              </p>
+              <p className="text-sm text-gray-700 flex justify-between">
+                <span className="font-medium">Certificate ID:</span> 
+                <span className="font-mono">{certificateData.certificateId}</span>
+              </p>
+              <p className="text-sm text-gray-700 flex justify-between">
+                <span className="font-medium">Generated on:</span> 
+                <span>{certificateData.date}</span>
+              </p>
+            </div>
           </div>
 
           <div className="hidden">
@@ -101,23 +162,34 @@ const Step3Download: React.FC<Step3DownloadProps> = ({
             />
           </div>
 
-          <Button
-            onClick={handleDownload}
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          >
-            <Download className="h-5 w-5 mr-2" />
-            Download Certificate (PDF)
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+            <Button
+              onClick={handleDownload}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-md flex-1"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Download PDF
+            </Button>
+            
+            <Button
+              onClick={handleImageDownload}
+              variant="outline"
+              className="border-blue-200 text-blue-700 hover:bg-blue-50 rounded-xl flex-1"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download Image
+            </Button>
+          </div>
 
-          <p className="mt-6 text-sm text-gray-500">
-            Your certificate data has been saved to Google Sheets.
+          <p className="text-sm text-gray-500">
+            Your certificate has been saved locally in your browser.
           </p>
 
           <div className="mt-8 pt-6 border-t border-gray-200">
             <Button
               variant="link"
               onClick={onCreateNew}
-              className="text-primary hover:text-indigo-700 font-medium"
+              className="text-blue-600 hover:text-blue-800 font-medium"
             >
               Create another certificate
             </Button>

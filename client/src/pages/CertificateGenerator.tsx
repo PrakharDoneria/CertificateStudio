@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import StepIndicator from "@/components/StepIndicator";
 import Step1Form from "@/pages/Step1Form";
 import Step2Preview from "@/pages/Step2Preview";
@@ -21,12 +21,23 @@ type CertificateData = InsertCertificate & {
   date: string;
 };
 
+const LOCAL_STORAGE_KEY = 'gdg-iec-certificates';
+
 const CertificateGenerator: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [certificateData, setCertificateData] = useState<CertificateData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedCertificates, setSavedCertificates] = useState<CertificateData[]>([]);
   const { toast } = useToast();
+
+  // Load certificates from local storage on initial render
+  useEffect(() => {
+    const storedCertificates = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedCertificates) {
+      setSavedCertificates(JSON.parse(storedCertificates));
+    }
+  }, []);
 
   const handleFormSubmit = (formData: InsertCertificate) => {
     const newCertificateData: CertificateData = {
@@ -49,32 +60,18 @@ const CertificateGenerator: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/certificates', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(certificateData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to generate certificate');
-      }
-
-      const data = await response.json();
-      setCertificateData({
-        ...certificateData,
-        certificateId: data.certificateId,
-      });
+      // Save to local storage instead of server
+      const updatedCertificates = [...savedCertificates, certificateData];
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedCertificates));
+      setSavedCertificates(updatedCertificates);
       
       setCurrentStep(2);
       toast({
         title: "Success!",
-        description: "Certificate has been saved to Google Sheets.",
+        description: "Certificate has been saved locally.",
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      setError(err instanceof Error ? err.message : 'Failed to save certificate locally');
     } finally {
       setIsLoading(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
