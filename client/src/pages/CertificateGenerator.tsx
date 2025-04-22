@@ -85,7 +85,7 @@ const CertificateGenerator: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div>
       <StepIndicator currentStep={currentStep} />
 
       {currentStep === 0 && <Step1Form onSubmit={handleFormSubmit} initialData={certificateData} />}
