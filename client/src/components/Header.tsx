@@ -1,7 +1,5 @@
 import React from "react";
 import { Award } from "lucide-react";
-import iecLogoPath from "/images/iec-logo.jpg";
-import gdgLogoPath from "/images/gdg-logo.png";
 
 const Header: React.FC = () => {
   return (
@@ -18,11 +16,6 @@ const Header: React.FC = () => {
               </h1>
               <p className="text-xs text-white/70">Generate professional project completion certificates</p>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <img src={iecLogoPath} alt="IEC Logo" className="h-10 w-10 object-contain bg-white/20 p-1 rounded-lg" />
-            <img src={gdgLogoPath} alt="GDG Logo" className="h-10 w-auto object-contain bg-white/20 p-1 rounded-lg" />
           </div>
         </div>
       </div>

@@ -16,8 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { AtSign, Github, Globe, FileText, User } from "lucide-react";
-import iecLogoPath from "/images/iec-logo.jpg";
-import gdgLogoPath from "/images/gdg-logo.png";
 
 type Step1FormProps = {
   onSubmit: (data: InsertCertificate) => void;
@@ -41,14 +39,13 @@ const Step1Form: React.FC<Step1FormProps> = ({ onSubmit, initialData }) => {
   return (
     <Card className="bg-white shadow-lg rounded-xl mb-8 overflow-hidden border-0">
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 text-white">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <img src={iecLogoPath} alt="IEC Logo" className="h-10 w-10 object-contain" />
-            <h2 className="text-2xl font-bold">
-              Certificate Generator
-            </h2>
+        <div className="flex items-center">
+          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-white/20 backdrop-blur-sm mr-4">
+            <User className="h-6 w-6 text-white" />
           </div>
-          <img src={gdgLogoPath} alt="GDG Logo" className="h-10 w-auto object-contain" />
+          <h2 className="text-2xl font-bold">
+            Enter Your Information
+          </h2>
         </div>
       </div>
       

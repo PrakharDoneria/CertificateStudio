@@ -162,22 +162,35 @@ const Step3Download: React.FC<Step3DownloadProps> = ({
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+          <div className="mb-6 text-center">
+            <h3 className="font-medium text-gray-800 mb-3">Download Options</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Choose your preferred format to download your certificate
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button
               onClick={handleDownload}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-md flex-1"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl shadow-md flex-1 py-6"
             >
-              <FileText className="h-4 w-4 mr-2" />
-              Download PDF
+              <div className="flex flex-col items-center">
+                <FileText className="h-6 w-6 mb-2" />
+                <span className="font-bold">PDF Format</span>
+                <span className="text-xs mt-1 text-blue-100">High quality for printing</span>
+              </div>
             </Button>
             
             <Button
               onClick={handleImageDownload}
               variant="outline"
-              className="border-blue-200 text-blue-700 hover:bg-blue-50 rounded-xl flex-1"
+              className="border-blue-200 text-blue-700 hover:bg-blue-50 rounded-xl flex-1 py-6"
             >
-              <Download className="h-4 w-4 mr-2" />
-              Download Image
+              <div className="flex flex-col items-center">
+                <Download className="h-6 w-6 mb-2" />
+                <span className="font-bold">Image Format</span>
+                <span className="text-xs mt-1 text-blue-600/70">Great for sharing online</span>
+              </div>
             </Button>
           </div>
 

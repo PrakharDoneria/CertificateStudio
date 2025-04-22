@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import Certificate from "@/components/Certificate";
 import { ChevronLeft, Eye, Award, SaveAll } from "lucide-react";
 import { InsertCertificate } from "@shared/schema";
-import iecLogoPath from "/images/iec-logo.jpg";
-import gdgLogoPath from "/images/gdg-logo.png";
 
 type Step2PreviewProps = {
   certificateData: InsertCertificate & {
@@ -80,10 +78,7 @@ const Step2Preview: React.FC<Step2PreviewProps> = ({
           </Button>
         </div>
         
-        <div className="mt-6 pt-4 border-t border-gray-200 flex justify-center space-x-8">
-          <img src={iecLogoPath} alt="IEC Logo" className="h-8 w-auto opacity-60" />
-          <img src={gdgLogoPath} alt="GDG Logo" className="h-8 w-auto opacity-60" />
-        </div>
+
       </CardContent>
     </Card>
   );
