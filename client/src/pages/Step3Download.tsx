@@ -26,7 +26,9 @@ const Step3Download: React.FC<Step3DownloadProps> = ({
   
   // Generate preview image when component mounts
   useEffect(() => {
-    generatePreview();
+    setTimeout(() => {
+      generatePreview();
+    }, 500); // Add a small delay to ensure the certificate is rendered
   }, []);
   
   const generatePreview = async () => {
@@ -37,12 +39,19 @@ const Step3Download: React.FC<Step3DownloadProps> = ({
         scale: 2,
         logging: false,
         useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
       });
       
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      const dataUrl = canvas.toDataURL('image/png', 1.0);
       setPreviewUrl(dataUrl);
     } catch (error) {
       console.error("Error generating preview:", error);
+      toast({
+        title: "Preview Generation Issue",
+        description: "There was a problem generating the certificate preview.",
+        variant: "destructive",
+      });
     }
   };
   
@@ -55,28 +64,55 @@ const Step3Download: React.FC<Step3DownloadProps> = ({
         description: "Please wait while we create your certificate.",
       });
       
-      const canvas = await html2canvas(certificateRef.current, {
-        scale: 2,
-        logging: false,
-        useCORS: true,
-      });
-      
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-      });
-      
-      const imgWidth = 280;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'JPEG', 10, 10, imgWidth, imgHeight);
-      pdf.save(`certificate_${certificateData.certificateId}.pdf`);
-      
-      toast({
-        title: "Success!",
-        description: "Certificate downloaded successfully.",
-      });
+      // Try to use the preview if already generated
+      if (previewUrl) {
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+        });
+        
+        const img = new Image();
+        img.src = previewUrl;
+        
+        img.onload = () => {
+          const imgWidth = 280;
+          const imgHeight = (img.height * imgWidth) / img.width;
+          
+          pdf.addImage(previewUrl, 'PNG', 10, 10, imgWidth, imgHeight);
+          pdf.save(`certificate_${certificateData.certificateId}.pdf`);
+          
+          toast({
+            title: "Success!",
+            description: "Certificate PDF downloaded successfully.",
+          });
+        };
+      } else {
+        // If no preview available, generate a new one
+        const canvas = await html2canvas(certificateRef.current, {
+          scale: 2,
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: "#ffffff",
+        });
+        
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+        });
+        
+        const imgWidth = 280;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        pdf.save(`certificate_${certificateData.certificateId}.pdf`);
+        
+        toast({
+          title: "Success!",
+          description: "Certificate PDF downloaded successfully.",
+        });
+      }
     } catch (error) {
       console.error("Download error:", error);
       toast({
@@ -88,19 +124,42 @@ const Step3Download: React.FC<Step3DownloadProps> = ({
   };
   
   const handleImageDownload = () => {
-    if (!previewUrl) return;
-    
-    const link = document.createElement('a');
-    link.href = previewUrl;
-    link.download = `certificate_${certificateData.certificateId}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast({
-      title: "Success!",
-      description: "Certificate image downloaded successfully.",
-    });
+    try {
+      if (!previewUrl) {
+        toast({
+          title: "Error",
+          description: "Certificate preview not available. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Create an anchor element and trigger download
+      const link = document.createElement('a');
+      link.href = previewUrl;
+      link.download = `certificate_${certificateData.certificateId}.png`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+        
+        toast({
+          title: "Success!",
+          description: "Certificate image downloaded successfully.",
+        });
+      }, 100);
+    } catch (error) {
+      console.error("Image download error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to download image. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
   
   return (

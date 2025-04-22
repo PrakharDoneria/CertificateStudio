@@ -14,9 +14,10 @@ type CertificateProps = {
 const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(
   ({ name, githubRepo, vercelDeployment, certificateId, date }, ref) => {
     return (
-      <div ref={ref} className="certificate-container border-8 border-blue-100 rounded-2xl relative bg-white p-8 shadow-[0_35px_60px_-15px_rgba(0,0,0,0.1)]">
+      <div ref={ref} className="certificate-container border-4 border-blue-100 rounded-lg relative bg-white p-8 shadow-md" style={{ fontFamily: 'Arial, sans-serif' }}>
+        {/* Background watermark */}
         <div 
-          className="absolute top-0 left-0 w-full h-full bg-center bg-no-repeat opacity-5 rounded-xl" 
+          className="absolute top-0 left-0 w-full h-full bg-center bg-no-repeat opacity-5" 
           style={{ 
             backgroundImage: `url(${iecLogoPath})`,
             backgroundSize: "300px",
@@ -26,7 +27,7 @@ const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(
         
         {/* Certificate Header with Logos */}
         <div className="text-center mb-8 relative">
-          <div className="mb-4 flex justify-between">
+          <div className="mb-6 flex justify-between">
             <img 
               src={iecLogoPath} 
               alt="IEC Logo" 
@@ -40,21 +41,21 @@ const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(
           </div>
           
           <div className="mb-2 mt-4">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text font-sans">Certificate of Completion</h1>
-            <div className="h-1 w-32 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mt-2 rounded-full"></div>
+            <h1 className="text-3xl font-bold text-blue-700 font-sans">Certificate of Completion</h1>
+            <div className="h-1 w-32 bg-blue-600 mx-auto mt-2"></div>
           </div>
         </div>
         
         {/* Certificate Body */}
         <div className="text-center mb-10">
           <p className="text-gray-600 mb-4">This is to certify that</p>
-          <p className="text-4xl font-bold text-gray-900 my-6 font-sans bg-gradient-to-r from-blue-700 to-purple-700 text-transparent bg-clip-text">{name}</p>
+          <p className="text-4xl font-bold text-blue-800 my-6 font-sans">{name}</p>
           <p className="text-gray-600">has successfully completed a web development project</p>
           <p className="text-gray-600 my-4">
-            Project deployed at: <span className="text-blue-600 font-medium">{vercelDeployment}</span>
+            Project deployed at: <span className="text-blue-700 font-medium">{vercelDeployment}</span>
           </p>
           <p className="text-gray-600">
-            GitHub Repository: <span className="text-blue-600 font-medium">{githubRepo}</span>
+            GitHub Repository: <span className="text-blue-700 font-medium">{githubRepo}</span>
           </p>
         </div>
         
@@ -68,7 +69,7 @@ const Certificate = React.forwardRef<HTMLDivElement, CertificateProps>(
           </div>
           <div className="text-right">
             <div className="w-40 h-16 flex items-end justify-end mb-1">
-              <div className="h-10 w-28 bg-gradient-to-r from-blue-600 to-purple-600 rounded-md opacity-70"></div>
+              <div className="h-10 w-28 bg-blue-600 rounded-sm"></div>
             </div>
             <div className="w-48 border-t-2 border-gray-400 pt-1">
               <p className="text-sm text-gray-600">Director Signature</p>
